@@ -1,0 +1,29 @@
+databases:
+  - name: uzbek-transliterator-db
+    plan: free
+    databaseName: uzbek_transliterator
+
+services:
+  - type: web
+    name: uzbek-transliterator
+    plan: free
+    runtime: docker
+    repo: https://github.com/Shahzod277/uzbek-transliterator
+    branch: master
+    envVars:
+      - key: BOT_TOKEN
+        value: 8478504038:AAGTZK6oXiIGHtlZfKgB9aTfnwWB33Li2jU
+      - key: BOT_USERNAME
+        value: uzbek_translit_bot
+      - key: DATABASE_URL
+        fromDatabase:
+          name: uzbek-transliterator-db
+          property: connectionString
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: uzbek-transliterator-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: uzbek-transliterator-db
+          property: password
