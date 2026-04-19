@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/uzbek_transliterator}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DATABASE_USERNAME:postgres}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DATABASE_PASSWORD:963}}
+    url: jdbc:postgresql://dpg-d7ic32navr4c73file40-a/uzbek_transliterator_db
+    username: uzbek_transliterator_db_user
+    password: DFfvrlq6flEq2UBy8UaZfx1i5yw0Vth0
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -14,5 +14,5 @@ server:
   port: ${PORT:8080}
 
 bot:
-  username: ${BOT_USERNAME:uzbek_translit_bot}
-  token: ${BOT_TOKEN:8478504038:AAGTZK6oXiIGHtlZfKgB9aTfnwWB33Li2jU}
+  username: uzbek_translit_bot
+  token: 8478504038:AAGTZK6oXiIGHtlZfKgB9aTfnwWB33Li2jU
