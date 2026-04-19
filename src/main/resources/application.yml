@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/uzbek_transliterator}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:963}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: ${PORT:8080}
+
+bot:
+  username: ${BOT_USERNAME:uzbek_translit_bot}
+  token: ${BOT_TOKEN:8478504038:AAGTZK6oXiIGHtlZfKgB9aTfnwWB33Li2jU}
