@@ -130,7 +130,7 @@ public class TransliteratorBot extends TelegramLongPollingBot {
         String welcomeText = """
                 Assalomu alaykum! \uD83D\uDC4B
 
-                Men O'zbek transliteratsiya botiman.
+                Men SHEVA TRANSLITERATSIYA botiman.
 
                 Davom etish uchun telefon raqamingizni yuboring \u2B07\uFE0F""";
 
@@ -173,6 +173,8 @@ public class TransliteratorBot extends TelegramLongPollingBot {
         userStateRepository.deleteById(chatId);
 
         String menuText = """
+                \uD83D\uDCDA SHEVA TRANSLITERATSIYA
+
                 Rejimni tanlang:
 
                 \uD83D\uDD24 Adabiy til → Yangi transkripsiya
