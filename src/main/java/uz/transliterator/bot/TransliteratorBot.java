@@ -103,7 +103,17 @@ public class TransliteratorBot extends TelegramLongPollingBot {
                 default -> handleTextConversion(chatId, username, text);
             }
         } catch (TelegramApiException e) {
-            log.error("Xatolik yuz berdi: chatId={}, error={}", chatId, e.getMessage(), e);
+            log.error("Telegram xatolik: chatId={}, error={}", chatId, e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Kutilmagan xatolik: chatId={}, error={}", chatId, e.getMessage(), e);
+            try {
+                SendMessage err = new SendMessage();
+                err.setChatId(chatId);
+                err.setText("\u26A0\uFE0F Xatolik yuz berdi. /start ni bosib qaytadan urinib ko'ring.");
+                execute(err);
+            } catch (TelegramApiException ex) {
+                log.error("Xatolik xabarini yuborib bo'lmadi: {}", ex.getMessage());
+            }
         }
     }
 
