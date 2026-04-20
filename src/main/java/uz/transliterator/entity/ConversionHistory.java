@@ -32,7 +32,7 @@ public class ConversionHistory {
     @Column(name = "converted_text", columnDefinition = "TEXT", nullable = false)
     private String convertedText;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = ConversionTypeConverter.class)
     @Column(name = "conversion_type", nullable = false)
     private ConversionType conversionType;
 

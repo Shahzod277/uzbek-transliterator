@@ -18,7 +18,7 @@ public class UserState {
     @Column(name = "chat_id")
     private Long chatId;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = ConversionTypeConverter.class)
     @Column(name = "conversion_type")
     private ConversionType conversionType;
 }
