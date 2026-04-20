@@ -34,8 +34,8 @@ public class TransliteratorBot extends TelegramLongPollingBot {
     private final UserStateRepository userStateRepository;
     private final BotUserRepository botUserRepository;
 
-    private static final String BTN_LITERARY_TO_NEW = "\uD83D\uDD24 Adabiy → Yangi transkripsiya";
-    private static final String BTN_LITERARY_TO_TRADITIONAL = "\uD83D\uDD24 Adabiy → An'anaviy (kirill)";
+    private static final String BTN_LITERARY_TO_NEW = "\uD83D\uDD24 Adabiy til → Yangi transkripsiya";
+    private static final String BTN_LITERARY_TO_TRADITIONAL = "\uD83D\uDD24 Adabiy til → An'anaviy (kirill)";
     private static final String BTN_TRADITIONAL_TO_NEW = "\uD83D\uDD04 An'anaviy (kirill) → Yangi";
     private static final String BTN_HISTORY = "\uD83D\uDCDC Tarix";
     private static final String BTN_BACK = "\u2B05\uFE0F Ortga";
@@ -175,8 +175,8 @@ public class TransliteratorBot extends TelegramLongPollingBot {
         String menuText = """
                 Rejimni tanlang:
 
-                \uD83D\uDD24 Adabiy → Yangi transkripsiya
-                \uD83D\uDD24 Adabiy → An'anaviy (kirill)
+                \uD83D\uDD24 Adabiy til → Yangi transkripsiya
+                \uD83D\uDD24 Adabiy til → An'anaviy (kirill)
                 \uD83D\uDD04 An'anaviy (kirill) → Yangi transkripsiya""";
 
         SendMessage message = new SendMessage();
@@ -195,9 +195,9 @@ public class TransliteratorBot extends TelegramLongPollingBot {
 
         String modeText = switch (type) {
             case LITERARY_TO_NEW ->
-                    "\uD83D\uDD24 Rejim: Adabiy → Yangi transkripsiya\n\nOʻzbek adabiy tilida matn yuboring:";
+                    "\uD83D\uDD24 Rejim: Adabiy til → Yangi transkripsiya\n\nOʻzbek adabiy tilida matn yuboring:";
             case LITERARY_TO_TRADITIONAL ->
-                    "\uD83D\uDD24 Rejim: Adabiy → An'anaviy (kirill)\n\nOʻzbek adabiy tilida matn yuboring:";
+                    "\uD83D\uDD24 Rejim: Adabiy til → An'anaviy (kirill)\n\nOʻzbek adabiy tilida matn yuboring:";
             case TRADITIONAL_TO_NEW ->
                     "\uD83D\uDD04 Rejim: An'anaviy (kirill) → Yangi transkripsiya\n\nAn'anaviy (kirill) yozuvida matn yuboring:";
         };
@@ -251,8 +251,8 @@ public class TransliteratorBot extends TelegramLongPollingBot {
             for (int i = 0; i < historyList.size(); i++) {
                 ConversionHistory h = historyList.get(i);
                 String typeName = switch (h.getConversionType()) {
-                    case LITERARY_TO_NEW -> "Adabiy→Yangi";
-                    case LITERARY_TO_TRADITIONAL -> "Adabiy→An'anaviy";
+                    case LITERARY_TO_NEW -> "Adabiy til→Yangi";
+                    case LITERARY_TO_TRADITIONAL -> "Adabiy til→An'anaviy";
                     case TRADITIONAL_TO_NEW -> "An'anaviy→Yangi";
                 };
                 sb.append(i + 1).append(". [").append(typeName).append("]\n");
