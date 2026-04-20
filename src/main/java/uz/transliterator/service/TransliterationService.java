@@ -9,287 +9,165 @@ import java.util.Map;
 @Service
 public class TransliterationService {
 
-    // Kirill → Yangi oʻzbek transkripsiyasi
-    private static final Map<String, String> CYRILLIC_TO_NEW_LATIN = new LinkedHashMap<>();
+    // Oʻzbek adabiy tili (lotin) → Yangi oʻzbek transkripsiyasi
+    private static final Map<String, String> LITERARY_TO_NEW = new LinkedHashMap<>();
 
-    // Kirill → Anʼanaviy transkripsiya
-    private static final Map<String, String> CYRILLIC_TO_TRADITIONAL_LATIN = new LinkedHashMap<>();
+    // Oʻzbek adabiy tili (lotin) → Anʼanaviy transkripsiya (kirill)
+    private static final Map<String, String> LITERARY_TO_TRADITIONAL = new LinkedHashMap<>();
 
-    // Yangi lotin → Anʼanaviy lotin
-    private static final Map<String, String> NEW_TO_TRADITIONAL = new LinkedHashMap<>();
+    // Anʼanaviy transkripsiya (kirill) → Yangi oʻzbek transkripsiyasi
+    private static final Map<String, String> TRADITIONAL_TO_NEW = new LinkedHashMap<>();
 
     static {
-        // ===== Kirill → Yangi oʻzbek transkripsiyasi =====
-        // Ikki harfli kombinatsiyalar birinchi
-        CYRILLIC_TO_NEW_LATIN.put("\u041D\u0433", "Ng");  // Нг
-        CYRILLIC_TO_NEW_LATIN.put("\u043D\u0433", "ng");  // нг
-        CYRILLIC_TO_NEW_LATIN.put("\u0427", "Ch");  // Ч
-        CYRILLIC_TO_NEW_LATIN.put("\u0447", "ch");  // ч
-        CYRILLIC_TO_NEW_LATIN.put("\u0428", "Sh");  // Ш
-        CYRILLIC_TO_NEW_LATIN.put("\u0448", "sh");  // ш
-        CYRILLIC_TO_NEW_LATIN.put("\u0429", "Sh");  // Щ
-        CYRILLIC_TO_NEW_LATIN.put("\u0449", "sh");  // щ
-        CYRILLIC_TO_NEW_LATIN.put("\u0401", "Yo");  // Ё
-        CYRILLIC_TO_NEW_LATIN.put("\u0451", "yo");  // ё
-        CYRILLIC_TO_NEW_LATIN.put("\u042E", "Yu");  // Ю
-        CYRILLIC_TO_NEW_LATIN.put("\u044E", "yu");  // ю
-        CYRILLIC_TO_NEW_LATIN.put("\u042F", "Ya");  // Я
-        CYRILLIC_TO_NEW_LATIN.put("\u044F", "ya");  // я
-        CYRILLIC_TO_NEW_LATIN.put("\u0426", "Ts");  // Ц
-        CYRILLIC_TO_NEW_LATIN.put("\u0446", "ts");  // ц
+        // ===== Adabiy → Yangi transkripsiya =====
+        // 2 harfli birikmalar (birinchi!)
+        putApostrophePairs(LITERARY_TO_NEW, "G", "\u0393");  // Gʻ → Γ
+        putApostrophePairs(LITERARY_TO_NEW, "g", "\u03B3");  // gʻ → γ
+        putApostrophePairs(LITERARY_TO_NEW, "O", "O");       // Oʻ → O
+        putApostrophePairs(LITERARY_TO_NEW, "o", "o");       // oʻ → o
+        LITERARY_TO_NEW.put("Ng", "\u01A0"); LITERARY_TO_NEW.put("NG", "\u01A0"); LITERARY_TO_NEW.put("ng", "\u019E");
+        LITERARY_TO_NEW.put("Ch", "\u010C"); LITERARY_TO_NEW.put("CH", "\u010C"); LITERARY_TO_NEW.put("ch", "\u010D");
+        LITERARY_TO_NEW.put("Sh", "\u0160"); LITERARY_TO_NEW.put("SH", "\u0160"); LITERARY_TO_NEW.put("sh", "\u0161");
 
-        // Bir harfli - docx jadvali bo'yicha
-        CYRILLIC_TO_NEW_LATIN.put("\u0410", "A");   // А
-        CYRILLIC_TO_NEW_LATIN.put("\u0430", "a");   // а
-        CYRILLIC_TO_NEW_LATIN.put("\u0411", "B");   // Б
-        CYRILLIC_TO_NEW_LATIN.put("\u0431", "b");   // б
-        CYRILLIC_TO_NEW_LATIN.put("\u0412", "V");   // В
-        CYRILLIC_TO_NEW_LATIN.put("\u0432", "v");   // в
-        CYRILLIC_TO_NEW_LATIN.put("\u0413", "G");   // Г
-        CYRILLIC_TO_NEW_LATIN.put("\u0433", "g");   // г
-        CYRILLIC_TO_NEW_LATIN.put("\u0492", "G\u02BB");  // Ғ → Gʻ
-        CYRILLIC_TO_NEW_LATIN.put("\u0493", "g\u02BB");  // ғ → gʻ
-        CYRILLIC_TO_NEW_LATIN.put("\u0414", "D");   // Д
-        CYRILLIC_TO_NEW_LATIN.put("\u0434", "d");   // д
-        CYRILLIC_TO_NEW_LATIN.put("\u0415", "E");   // Е
-        CYRILLIC_TO_NEW_LATIN.put("\u0435", "e");   // е
-        CYRILLIC_TO_NEW_LATIN.put("\u0416", "J");   // Ж
-        CYRILLIC_TO_NEW_LATIN.put("\u0436", "j");   // ж
-        CYRILLIC_TO_NEW_LATIN.put("\u0417", "Z");   // З
-        CYRILLIC_TO_NEW_LATIN.put("\u0437", "z");   // з
-        CYRILLIC_TO_NEW_LATIN.put("\u0418", "I");   // И
-        CYRILLIC_TO_NEW_LATIN.put("\u0438", "i");   // и
-        CYRILLIC_TO_NEW_LATIN.put("\u042B", "I");   // Ы → I
-        CYRILLIC_TO_NEW_LATIN.put("\u044B", "i");   // ы → i
-        CYRILLIC_TO_NEW_LATIN.put("\u0419", "Y");   // Й
-        CYRILLIC_TO_NEW_LATIN.put("\u0439", "y");   // й
-        CYRILLIC_TO_NEW_LATIN.put("\u041A", "K");   // К
-        CYRILLIC_TO_NEW_LATIN.put("\u043A", "k");   // к
-        CYRILLIC_TO_NEW_LATIN.put("\u049A", "Q");   // Қ
-        CYRILLIC_TO_NEW_LATIN.put("\u049B", "q");   // қ
-        CYRILLIC_TO_NEW_LATIN.put("\u041B", "L");   // Л
-        CYRILLIC_TO_NEW_LATIN.put("\u043B", "l");   // л
-        CYRILLIC_TO_NEW_LATIN.put("\u041C", "M");   // М
-        CYRILLIC_TO_NEW_LATIN.put("\u043C", "m");   // м
-        CYRILLIC_TO_NEW_LATIN.put("\u041D", "N");   // Н
-        CYRILLIC_TO_NEW_LATIN.put("\u043D", "n");   // н
-        CYRILLIC_TO_NEW_LATIN.put("\u041E", "O\u2019");  // О → O'
-        CYRILLIC_TO_NEW_LATIN.put("\u043E", "o\u2019");  // о → o'
-        CYRILLIC_TO_NEW_LATIN.put("\u04E8", "O\u2019");  // Ө → O'
-        CYRILLIC_TO_NEW_LATIN.put("\u04E9", "o\u2019");  // ө → o'
-        CYRILLIC_TO_NEW_LATIN.put("\u041F", "P");   // П
-        CYRILLIC_TO_NEW_LATIN.put("\u043F", "p");   // п
-        CYRILLIC_TO_NEW_LATIN.put("\u0420", "R");   // Р
-        CYRILLIC_TO_NEW_LATIN.put("\u0440", "r");   // р
-        CYRILLIC_TO_NEW_LATIN.put("\u0421", "S");   // С
-        CYRILLIC_TO_NEW_LATIN.put("\u0441", "s");   // с
-        CYRILLIC_TO_NEW_LATIN.put("\u0422", "T");   // Т
-        CYRILLIC_TO_NEW_LATIN.put("\u0442", "t");   // т
-        CYRILLIC_TO_NEW_LATIN.put("\u0423", "U");   // У
-        CYRILLIC_TO_NEW_LATIN.put("\u0443", "u");   // у
-        CYRILLIC_TO_NEW_LATIN.put("\u04AE", "U");   // Ү → U
-        CYRILLIC_TO_NEW_LATIN.put("\u04AF", "u");   // ү → u
-        CYRILLIC_TO_NEW_LATIN.put("\u0424", "F");   // Ф
-        CYRILLIC_TO_NEW_LATIN.put("\u0444", "f");   // ф
-        CYRILLIC_TO_NEW_LATIN.put("\u0425", "X");   // Х
-        CYRILLIC_TO_NEW_LATIN.put("\u0445", "x");   // х
-        CYRILLIC_TO_NEW_LATIN.put("\u04B2", "H");   // Ҳ
-        CYRILLIC_TO_NEW_LATIN.put("\u04B3", "h");   // ҳ
-        CYRILLIC_TO_NEW_LATIN.put("\u042A", "");    // Ъ
-        CYRILLIC_TO_NEW_LATIN.put("\u044A", "");    // ъ
-        CYRILLIC_TO_NEW_LATIN.put("\u042C", "");    // Ь
-        CYRILLIC_TO_NEW_LATIN.put("\u044C", "");    // ь
-        CYRILLIC_TO_NEW_LATIN.put("\u042D", "E");   // Э
-        CYRILLIC_TO_NEW_LATIN.put("\u044D", "e");   // э
-        CYRILLIC_TO_NEW_LATIN.put("\u040E", "O\u02BB");  // Ў → Oʻ
-        CYRILLIC_TO_NEW_LATIN.put("\u045E", "o\u02BB");  // ў → oʻ
+        // 1 harfli
+        LITERARY_TO_NEW.put("A", "A"); LITERARY_TO_NEW.put("a", "a");
+        LITERARY_TO_NEW.put("B", "B"); LITERARY_TO_NEW.put("b", "b");
+        LITERARY_TO_NEW.put("V", "V"); LITERARY_TO_NEW.put("v", "v");
+        LITERARY_TO_NEW.put("G", "G"); LITERARY_TO_NEW.put("g", "g");
+        LITERARY_TO_NEW.put("D", "D"); LITERARY_TO_NEW.put("d", "d");
+        LITERARY_TO_NEW.put("E", "E"); LITERARY_TO_NEW.put("e", "e");
+        LITERARY_TO_NEW.put("J", "\u01EE"); LITERARY_TO_NEW.put("j", "\u01EF");  // Ǯ / ǯ
+        LITERARY_TO_NEW.put("Z", "Z"); LITERARY_TO_NEW.put("z", "z");
+        LITERARY_TO_NEW.put("I", "I"); LITERARY_TO_NEW.put("i", "i");
+        LITERARY_TO_NEW.put("Y", "J"); LITERARY_TO_NEW.put("y", "j");
+        LITERARY_TO_NEW.put("K", "K"); LITERARY_TO_NEW.put("k", "k");
+        LITERARY_TO_NEW.put("Q", "Q"); LITERARY_TO_NEW.put("q", "q");
+        LITERARY_TO_NEW.put("L", "L"); LITERARY_TO_NEW.put("l", "l");
+        LITERARY_TO_NEW.put("M", "M"); LITERARY_TO_NEW.put("m", "m");
+        LITERARY_TO_NEW.put("N", "N"); LITERARY_TO_NEW.put("n", "n");
+        LITERARY_TO_NEW.put("O", "\u0100"); LITERARY_TO_NEW.put("o", "\u0101");  // Ā / ā
+        LITERARY_TO_NEW.put("P", "P"); LITERARY_TO_NEW.put("p", "p");
+        LITERARY_TO_NEW.put("R", "R"); LITERARY_TO_NEW.put("r", "r");
+        LITERARY_TO_NEW.put("S", "S"); LITERARY_TO_NEW.put("s", "s");
+        LITERARY_TO_NEW.put("T", "T"); LITERARY_TO_NEW.put("t", "t");
+        LITERARY_TO_NEW.put("U", "U"); LITERARY_TO_NEW.put("u", "u");
+        LITERARY_TO_NEW.put("F", "F"); LITERARY_TO_NEW.put("f", "f");
+        LITERARY_TO_NEW.put("X", "X"); LITERARY_TO_NEW.put("x", "x");
+        LITERARY_TO_NEW.put("H", "H"); LITERARY_TO_NEW.put("h", "h");
 
-        // ===== Kirill → Anʼanaviy transkripsiya =====
-        // Ikki harfli kombinatsiyalar birinchi
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u041D\u0433", "\u01A0");  // Нг → Ƞ
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u043D\u0433", "\u019E");  // нг → ƞ
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0427", "\u010C");  // Ч → Č
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0447", "\u010D");  // ч → č
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0428", "\u0160");  // Ш → Š
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0448", "\u0161");  // ш → š
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0429", "\u0160");  // Щ → Š
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0449", "\u0161");  // щ → š
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0401", "Yo");  // Ё
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0451", "yo");  // ё
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u042E", "Yu");  // Ю
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u044E", "yu");  // ю
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u042F", "Ya");  // Я
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u044F", "ya");  // я
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0426", "Ts");  // Ц
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0446", "ts");  // ц
+        // ===== Adabiy → Anʼanaviy (Kirill) =====
+        putApostrophePairs(LITERARY_TO_TRADITIONAL, "G", "\u0492");  // Gʻ → Ғ
+        putApostrophePairs(LITERARY_TO_TRADITIONAL, "g", "\u0493");  // gʻ → ғ
+        putApostrophePairs(LITERARY_TO_TRADITIONAL, "O", "\u041E");  // Oʻ → О
+        putApostrophePairs(LITERARY_TO_TRADITIONAL, "o", "\u043E");  // oʻ → о
+        LITERARY_TO_TRADITIONAL.put("Ng", "\u041D\u0433"); LITERARY_TO_TRADITIONAL.put("NG", "\u041D\u0413"); LITERARY_TO_TRADITIONAL.put("ng", "\u043D\u0433");
+        LITERARY_TO_TRADITIONAL.put("Ch", "\u0427"); LITERARY_TO_TRADITIONAL.put("CH", "\u0427"); LITERARY_TO_TRADITIONAL.put("ch", "\u0447");
+        LITERARY_TO_TRADITIONAL.put("Sh", "\u0428"); LITERARY_TO_TRADITIONAL.put("SH", "\u0428"); LITERARY_TO_TRADITIONAL.put("sh", "\u0448");
 
-        // Bir harfli
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0410", "A");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0430", "a");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0411", "B");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0431", "b");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0412", "V");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0432", "v");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0413", "G");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0433", "g");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0492", "\u0194");  // Ғ → Ɣ
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0493", "\u0263");  // ғ → ɣ
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0414", "D");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0434", "d");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0415", "E");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0435", "e");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0416", "\u01EE");  // Ж → Ǯ
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0436", "\u01EF");  // ж → ǯ
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0417", "Z");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0437", "z");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0418", "I:");  // И → I:
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0438", "i:");  // и → i:
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u042B", "\u00CF:");  // Ы → Ï:
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u044B", "\u00EF:");  // ы → ï:
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0419", "J");   // Й → J
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0439", "j");   // й → j
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u041A", "K");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u043A", "k");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u049A", "Q");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u049B", "q");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u041B", "L");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u043B", "l");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u041C", "M");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u043C", "m");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u041D", "N");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u043D", "n");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u041E", "O");   // О → O
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u043E", "o");   // о → o
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u04E8", "\u00D6");  // Ө → Ö
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u04E9", "\u00F6");  // ө → ö
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u041F", "P");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u043F", "p");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0420", "R");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0440", "r");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0421", "S");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0441", "s");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0422", "T");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0442", "t");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0423", "U");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0443", "u");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u04AE", "\u00DC");  // Ү → Ü
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u04AF", "\u00FC");  // ү → ü
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0424", "F");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0444", "f");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0425", "X");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u0445", "x");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u04B2", "H");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u04B3", "h");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u042A", "i");   // Ъ → i
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u044A", "i");   // ъ → i
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u042C", "\u00EF");  // Ь → ï
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u044C", "\u00EF");  // ь → ï
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u042D", "E");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u044D", "e");
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u040E", "O\u02BB");  // Ў → Oʻ
-        CYRILLIC_TO_TRADITIONAL_LATIN.put("\u045E", "o\u02BB");  // ў → oʻ
+        LITERARY_TO_TRADITIONAL.put("A", "\u0410"); LITERARY_TO_TRADITIONAL.put("a", "\u0430");
+        LITERARY_TO_TRADITIONAL.put("B", "\u0411"); LITERARY_TO_TRADITIONAL.put("b", "\u0431");
+        LITERARY_TO_TRADITIONAL.put("V", "\u0412"); LITERARY_TO_TRADITIONAL.put("v", "\u0432");
+        LITERARY_TO_TRADITIONAL.put("G", "\u0413"); LITERARY_TO_TRADITIONAL.put("g", "\u0433");
+        LITERARY_TO_TRADITIONAL.put("D", "\u0414"); LITERARY_TO_TRADITIONAL.put("d", "\u0434");
+        LITERARY_TO_TRADITIONAL.put("E", "\u0415"); LITERARY_TO_TRADITIONAL.put("e", "\u0435");
+        LITERARY_TO_TRADITIONAL.put("J", "\u0416"); LITERARY_TO_TRADITIONAL.put("j", "\u0436");
+        LITERARY_TO_TRADITIONAL.put("Z", "\u0417"); LITERARY_TO_TRADITIONAL.put("z", "\u0437");
+        LITERARY_TO_TRADITIONAL.put("I", "\u042A"); LITERARY_TO_TRADITIONAL.put("i", "\u044A");  // I → Ъ
+        LITERARY_TO_TRADITIONAL.put("Y", "\u0419"); LITERARY_TO_TRADITIONAL.put("y", "\u0439");
+        LITERARY_TO_TRADITIONAL.put("K", "\u041A"); LITERARY_TO_TRADITIONAL.put("k", "\u043A");
+        LITERARY_TO_TRADITIONAL.put("Q", "\u049A"); LITERARY_TO_TRADITIONAL.put("q", "\u049B");
+        LITERARY_TO_TRADITIONAL.put("L", "\u041B"); LITERARY_TO_TRADITIONAL.put("l", "\u043B");
+        LITERARY_TO_TRADITIONAL.put("M", "\u041C"); LITERARY_TO_TRADITIONAL.put("m", "\u043C");
+        LITERARY_TO_TRADITIONAL.put("N", "\u041D"); LITERARY_TO_TRADITIONAL.put("n", "\u043D");
+        LITERARY_TO_TRADITIONAL.put("O", "\u0186"); LITERARY_TO_TRADITIONAL.put("o", "\u0254");  // O → Ɔ / ɔ
+        LITERARY_TO_TRADITIONAL.put("P", "\u041F"); LITERARY_TO_TRADITIONAL.put("p", "\u043F");
+        LITERARY_TO_TRADITIONAL.put("R", "\u0420"); LITERARY_TO_TRADITIONAL.put("r", "\u0440");
+        LITERARY_TO_TRADITIONAL.put("S", "\u0421"); LITERARY_TO_TRADITIONAL.put("s", "\u0441");
+        LITERARY_TO_TRADITIONAL.put("T", "\u0422"); LITERARY_TO_TRADITIONAL.put("t", "\u0442");
+        LITERARY_TO_TRADITIONAL.put("U", "\u0423"); LITERARY_TO_TRADITIONAL.put("u", "\u0443");
+        LITERARY_TO_TRADITIONAL.put("F", "\u0424"); LITERARY_TO_TRADITIONAL.put("f", "\u0444");
+        LITERARY_TO_TRADITIONAL.put("X", "\u0425"); LITERARY_TO_TRADITIONAL.put("x", "\u0445");
+        LITERARY_TO_TRADITIONAL.put("H", "\u04B2"); LITERARY_TO_TRADITIONAL.put("h", "\u04B3");
 
-        // ===== Yangi lotin → Anʼanaviy lotin =====
-        // Ikki/uch harfli birinchi
-        NEW_TO_TRADITIONAL.put("G\u02BB", "\u0194");   // Gʻ → Ɣ
-        NEW_TO_TRADITIONAL.put("g\u02BB", "\u0263");   // gʻ → ɣ
-        NEW_TO_TRADITIONAL.put("O\u02BB", "O\u02BB");  // Oʻ → Oʻ (o'zgarishsiz)
-        NEW_TO_TRADITIONAL.put("o\u02BB", "o\u02BB");
-        NEW_TO_TRADITIONAL.put("O\u2019", "O");        // O' → O
-        NEW_TO_TRADITIONAL.put("o\u2019", "o");        // o' → o
-        NEW_TO_TRADITIONAL.put("Ng", "\u01A0");        // Ng → Ƞ
-        NEW_TO_TRADITIONAL.put("ng", "\u019E");        // ng → ƞ
-        NEW_TO_TRADITIONAL.put("Ch", "\u010C");        // Ch → Č
-        NEW_TO_TRADITIONAL.put("ch", "\u010D");        // ch → č
-        NEW_TO_TRADITIONAL.put("Sh", "\u0160");        // Sh → Š
-        NEW_TO_TRADITIONAL.put("sh", "\u0161");        // sh → š
-        // Bir harfli
-        NEW_TO_TRADITIONAL.put("J", "\u01EE");   // J → Ǯ
-        NEW_TO_TRADITIONAL.put("j", "\u01EF");   // j → ǯ
-        NEW_TO_TRADITIONAL.put("Y", "J");        // Y → J
-        NEW_TO_TRADITIONAL.put("y", "j");        // y → j
-        NEW_TO_TRADITIONAL.put("I", "I:");       // I → I:
-        NEW_TO_TRADITIONAL.put("i", "i:");       // i → i:
+        // ===== Anʼanaviy (Kirill) → Yangi transkripsiya (doc1) =====
+        TRADITIONAL_TO_NEW.put("\u041D\u0433", "\u01A0");  // Нг → Ƞ
+        TRADITIONAL_TO_NEW.put("\u041D\u0413", "\u01A0");  // НГ → Ƞ
+        TRADITIONAL_TO_NEW.put("\u043D\u0433", "\u019E");  // нг → ƞ
+
+        TRADITIONAL_TO_NEW.put("\u0410", "A"); TRADITIONAL_TO_NEW.put("\u0430", "a");
+        TRADITIONAL_TO_NEW.put("\u0411", "B"); TRADITIONAL_TO_NEW.put("\u0431", "b");
+        TRADITIONAL_TO_NEW.put("\u0412", "V"); TRADITIONAL_TO_NEW.put("\u0432", "v");
+        TRADITIONAL_TO_NEW.put("\u0413", "G"); TRADITIONAL_TO_NEW.put("\u0433", "g");
+        TRADITIONAL_TO_NEW.put("\u0492", "\u0393"); TRADITIONAL_TO_NEW.put("\u0493", "\u03B3");  // Ғ → Γ, ғ → γ
+        TRADITIONAL_TO_NEW.put("\u0414", "D"); TRADITIONAL_TO_NEW.put("\u0434", "d");
+        TRADITIONAL_TO_NEW.put("\u0415", "E"); TRADITIONAL_TO_NEW.put("\u0435", "e");
+        TRADITIONAL_TO_NEW.put("\u0416", "\u01EE"); TRADITIONAL_TO_NEW.put("\u0436", "\u01EF");  // Ж → Ǯ, ж → ǯ
+        TRADITIONAL_TO_NEW.put("\u0417", "Z"); TRADITIONAL_TO_NEW.put("\u0437", "z");
+        TRADITIONAL_TO_NEW.put("\u0418", "I:"); TRADITIONAL_TO_NEW.put("\u0438", "i:");
+        TRADITIONAL_TO_NEW.put("\u042B", "\u00CF:"); TRADITIONAL_TO_NEW.put("\u044B", "\u00EF:");  // Ы → Ï:, ы → ï:
+        TRADITIONAL_TO_NEW.put("\u0419", "J"); TRADITIONAL_TO_NEW.put("\u0439", "j");
+        TRADITIONAL_TO_NEW.put("\u041A", "K"); TRADITIONAL_TO_NEW.put("\u043A", "k");
+        TRADITIONAL_TO_NEW.put("\u049A", "Q"); TRADITIONAL_TO_NEW.put("\u049B", "q");
+        TRADITIONAL_TO_NEW.put("\u041B", "L"); TRADITIONAL_TO_NEW.put("\u043B", "l");
+        TRADITIONAL_TO_NEW.put("\u041C", "M"); TRADITIONAL_TO_NEW.put("\u043C", "m");
+        TRADITIONAL_TO_NEW.put("\u041D", "N"); TRADITIONAL_TO_NEW.put("\u043D", "n");
+        TRADITIONAL_TO_NEW.put("\u041E", "O"); TRADITIONAL_TO_NEW.put("\u043E", "o");
+        TRADITIONAL_TO_NEW.put("\u04E8", "\u00D6"); TRADITIONAL_TO_NEW.put("\u04E9", "\u00F6");  // Ө → Ö
+        TRADITIONAL_TO_NEW.put("\u041F", "P"); TRADITIONAL_TO_NEW.put("\u043F", "p");
+        TRADITIONAL_TO_NEW.put("\u0420", "R"); TRADITIONAL_TO_NEW.put("\u0440", "r");
+        TRADITIONAL_TO_NEW.put("\u0421", "S"); TRADITIONAL_TO_NEW.put("\u0441", "s");
+        TRADITIONAL_TO_NEW.put("\u0422", "T"); TRADITIONAL_TO_NEW.put("\u0442", "t");
+        TRADITIONAL_TO_NEW.put("\u0423", "U"); TRADITIONAL_TO_NEW.put("\u0443", "u");
+        TRADITIONAL_TO_NEW.put("\u04AE", "\u00DC"); TRADITIONAL_TO_NEW.put("\u04AF", "\u00FC");  // Ү → Ü
+        TRADITIONAL_TO_NEW.put("\u0424", "F"); TRADITIONAL_TO_NEW.put("\u0444", "f");
+        TRADITIONAL_TO_NEW.put("\u0425", "X"); TRADITIONAL_TO_NEW.put("\u0445", "x");
+        TRADITIONAL_TO_NEW.put("\u04B2", "H"); TRADITIONAL_TO_NEW.put("\u04B3", "h");
+        TRADITIONAL_TO_NEW.put("\u0427", "\u010C"); TRADITIONAL_TO_NEW.put("\u0447", "\u010D");  // Ч → Č
+        TRADITIONAL_TO_NEW.put("\u0428", "\u0160"); TRADITIONAL_TO_NEW.put("\u0448", "\u0161");  // Ш → Š
+        TRADITIONAL_TO_NEW.put("\u042A", "i"); TRADITIONAL_TO_NEW.put("\u044A", "i");           // Ъ → i
+        TRADITIONAL_TO_NEW.put("\u042C", "\u00EF"); TRADITIONAL_TO_NEW.put("\u044C", "\u00EF"); // Ь → ï
+        TRADITIONAL_TO_NEW.put("\u042D", "E"); TRADITIONAL_TO_NEW.put("\u044D", "e");           // Э → E
+    }
+
+    /**
+     * Gʻ/Oʻ kabi harflar uchun 4 xil apostrof variantini qo'shadi (ʻ ' ' ').
+     */
+    private static void putApostrophePairs(Map<String, String> map, String base, String target) {
+        map.put(base + "\u02BB", target);  // ʻ (standart)
+        map.put(base + "\u2019", target);  // ' (right single quote)
+        map.put(base + "\u2018", target);  // ' (left single quote)
+        map.put(base + "'", target);       // ' (plain apostrophe)
     }
 
     public String convert(String text, ConversionType type) {
         return switch (type) {
-            case CYRILLIC_TO_NEW_LATIN -> cyrillicToLatin(text, CYRILLIC_TO_NEW_LATIN);
-            case CYRILLIC_TO_TRADITIONAL_LATIN -> cyrillicToLatin(text, CYRILLIC_TO_TRADITIONAL_LATIN);
-            case NEW_LATIN_TO_TRADITIONAL_LATIN -> newLatinToTraditional(text);
+            case LITERARY_TO_NEW -> applyMapping(text, LITERARY_TO_NEW);
+            case LITERARY_TO_TRADITIONAL -> applyMapping(text, LITERARY_TO_TRADITIONAL);
+            case TRADITIONAL_TO_NEW -> applyMapping(text, TRADITIONAL_TO_NEW);
         };
     }
 
-    private String cyrillicToLatin(String text, Map<String, String> mapping) {
+    private String applyMapping(String text, Map<String, String> mapping) {
         StringBuilder result = new StringBuilder();
         int i = 0;
         while (i < text.length()) {
-            boolean replaced = false;
-
-            // 2 ta harfli kombinatsiyalarni tekshirish (Нг, etc.)
+            // 2 ta harfli birikmalar (Gʻ, Oʻ, Ng, Ch, Sh, Нг) birinchi
             if (i + 1 < text.length()) {
                 String twoChar = text.substring(i, i + 2);
                 if (mapping.containsKey(twoChar)) {
                     result.append(mapping.get(twoChar));
                     i += 2;
-                    replaced = true;
+                    continue;
                 }
             }
 
-            if (!replaced) {
-                char ch = text.charAt(i);
-                // "Е" harfi so'z boshida "Ye" bo'ladi
-                if (ch == '\u0415' && isWordStart(text, i)) {
-                    result.append("Ye");
-                    i++;
-                } else if (ch == '\u0435' && isWordStart(text, i)) {
-                    result.append("ye");
-                    i++;
-                } else {
-                    String oneChar = String.valueOf(ch);
-                    if (mapping.containsKey(oneChar)) {
-                        result.append(mapping.get(oneChar));
-                    } else {
-                        result.append(ch);
-                    }
-                    i++;
-                }
+            String oneChar = String.valueOf(text.charAt(i));
+            if (mapping.containsKey(oneChar)) {
+                result.append(mapping.get(oneChar));
+            } else {
+                result.append(text.charAt(i));
             }
-        }
-        return result.toString();
-    }
-
-    private boolean isWordStart(String text, int index) {
-        if (index == 0) return true;
-        char prev = text.charAt(index - 1);
-        return !Character.isLetter(prev);
-    }
-
-    private String newLatinToTraditional(String text) {
-        StringBuilder result = new StringBuilder();
-        int i = 0;
-        while (i < text.length()) {
-            boolean replaced = false;
-
-            // 2 ta harfli kombinatsiyalar tekshirish
-            if (i + 1 < text.length()) {
-                String twoChar = text.substring(i, i + 2);
-                if (NEW_TO_TRADITIONAL.containsKey(twoChar)) {
-                    result.append(NEW_TO_TRADITIONAL.get(twoChar));
-                    i += 2;
-                    replaced = true;
-                }
-            }
-
-            if (!replaced) {
-                String oneChar = String.valueOf(text.charAt(i));
-                if (NEW_TO_TRADITIONAL.containsKey(oneChar)) {
-                    result.append(NEW_TO_TRADITIONAL.get(oneChar));
-                } else {
-                    result.append(text.charAt(i));
-                }
-                i++;
-            }
+            i++;
         }
         return result.toString();
     }

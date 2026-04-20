@@ -34,9 +34,9 @@ public class TransliteratorBot extends TelegramLongPollingBot {
     private final UserStateRepository userStateRepository;
     private final BotUserRepository botUserRepository;
 
-    private static final String BTN_CYRILLIC_TO_NEW = "\uD83D\uDD24 Kirill → Yangi lotin";
-    private static final String BTN_CYRILLIC_TO_TRADITIONAL = "\uD83D\uDD24 Kirill → An'anaviy lotin";
-    private static final String BTN_NEW_TO_TRADITIONAL = "\uD83D\uDD04 Yangi lotin → An'anaviy lotin";
+    private static final String BTN_LITERARY_TO_NEW = "\uD83D\uDD24 Adabiy → Yangi transkripsiya";
+    private static final String BTN_LITERARY_TO_TRADITIONAL = "\uD83D\uDD24 Adabiy → An'anaviy (kirill)";
+    private static final String BTN_TRADITIONAL_TO_NEW = "\uD83D\uDD04 An'anaviy (kirill) → Yangi";
     private static final String BTN_HISTORY = "\uD83D\uDCDC Tarix";
     private static final String BTN_BACK = "\u2B05\uFE0F Ortga";
 
@@ -95,9 +95,9 @@ public class TransliteratorBot extends TelegramLongPollingBot {
             String username = update.getMessage().getFrom().getUserName();
 
             switch (text) {
-                case BTN_CYRILLIC_TO_NEW -> handleModeSelection(chatId, ConversionType.CYRILLIC_TO_NEW_LATIN);
-                case BTN_CYRILLIC_TO_TRADITIONAL -> handleModeSelection(chatId, ConversionType.CYRILLIC_TO_TRADITIONAL_LATIN);
-                case BTN_NEW_TO_TRADITIONAL -> handleModeSelection(chatId, ConversionType.NEW_LATIN_TO_TRADITIONAL_LATIN);
+                case BTN_LITERARY_TO_NEW -> handleModeSelection(chatId, ConversionType.LITERARY_TO_NEW);
+                case BTN_LITERARY_TO_TRADITIONAL -> handleModeSelection(chatId, ConversionType.LITERARY_TO_TRADITIONAL);
+                case BTN_TRADITIONAL_TO_NEW -> handleModeSelection(chatId, ConversionType.TRADITIONAL_TO_NEW);
                 case BTN_HISTORY -> handleHistory(chatId);
                 case BTN_BACK -> showMainMenu(chatId);
                 default -> handleTextConversion(chatId, username, text);
@@ -165,9 +165,9 @@ public class TransliteratorBot extends TelegramLongPollingBot {
         String menuText = """
                 Rejimni tanlang:
 
-                \uD83D\uDD24 Kirill → Yangi lotin — Кириллдан янги лотинга
-                \uD83D\uDD24 Kirill → An'anaviy lotin — Кириллдан анъанавий лотинга
-                \uD83D\uDD04 Yangi lotin → An'anaviy lotin — Янги лотиндан анъанавийга""";
+                \uD83D\uDD24 Adabiy → Yangi transkripsiya
+                \uD83D\uDD24 Adabiy → An'anaviy (kirill)
+                \uD83D\uDD04 An'anaviy (kirill) → Yangi transkripsiya""";
 
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
@@ -184,12 +184,12 @@ public class TransliteratorBot extends TelegramLongPollingBot {
         userStateRepository.save(state);
 
         String modeText = switch (type) {
-            case CYRILLIC_TO_NEW_LATIN ->
-                    "\uD83D\uDD24 Rejim: Kirill → Yangi lotin\n\nKirill yozuvida matn yuboring:";
-            case CYRILLIC_TO_TRADITIONAL_LATIN ->
-                    "\uD83D\uDD24 Rejim: Kirill → An'anaviy lotin\n\nKirill yozuvida matn yuboring:";
-            case NEW_LATIN_TO_TRADITIONAL_LATIN ->
-                    "\uD83D\uDD04 Rejim: Yangi lotin → An'anaviy lotin\n\nYangi lotin yozuvida matn yuboring:";
+            case LITERARY_TO_NEW ->
+                    "\uD83D\uDD24 Rejim: Adabiy → Yangi transkripsiya\n\nOʻzbek adabiy tilida matn yuboring:";
+            case LITERARY_TO_TRADITIONAL ->
+                    "\uD83D\uDD24 Rejim: Adabiy → An'anaviy (kirill)\n\nOʻzbek adabiy tilida matn yuboring:";
+            case TRADITIONAL_TO_NEW ->
+                    "\uD83D\uDD04 Rejim: An'anaviy (kirill) → Yangi transkripsiya\n\nAn'anaviy (kirill) yozuvida matn yuboring:";
         };
 
         SendMessage message = new SendMessage();
@@ -241,9 +241,9 @@ public class TransliteratorBot extends TelegramLongPollingBot {
             for (int i = 0; i < historyList.size(); i++) {
                 ConversionHistory h = historyList.get(i);
                 String typeName = switch (h.getConversionType()) {
-                    case CYRILLIC_TO_NEW_LATIN -> "Kirill→Yangi";
-                    case CYRILLIC_TO_TRADITIONAL_LATIN -> "Kirill→An'anaviy";
-                    case NEW_LATIN_TO_TRADITIONAL_LATIN -> "Yangi→An'anaviy";
+                    case LITERARY_TO_NEW -> "Adabiy→Yangi";
+                    case LITERARY_TO_TRADITIONAL -> "Adabiy→An'anaviy";
+                    case TRADITIONAL_TO_NEW -> "An'anaviy→Yangi";
                 };
                 sb.append(i + 1).append(". [").append(typeName).append("]\n");
                 sb.append("   ").append(truncate(h.getOriginalText(), 50)).append("\n");
@@ -286,15 +286,15 @@ public class TransliteratorBot extends TelegramLongPollingBot {
         List<KeyboardRow> rows = new ArrayList<>();
 
         KeyboardRow row1 = new KeyboardRow();
-        row1.add(new KeyboardButton(BTN_CYRILLIC_TO_NEW));
+        row1.add(new KeyboardButton(BTN_LITERARY_TO_NEW));
         rows.add(row1);
 
         KeyboardRow row2 = new KeyboardRow();
-        row2.add(new KeyboardButton(BTN_CYRILLIC_TO_TRADITIONAL));
+        row2.add(new KeyboardButton(BTN_LITERARY_TO_TRADITIONAL));
         rows.add(row2);
 
         KeyboardRow row3 = new KeyboardRow();
-        row3.add(new KeyboardButton(BTN_NEW_TO_TRADITIONAL));
+        row3.add(new KeyboardButton(BTN_TRADITIONAL_TO_NEW));
         rows.add(row3);
 
         KeyboardRow row4 = new KeyboardRow();
