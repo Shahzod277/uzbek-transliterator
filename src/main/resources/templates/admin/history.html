@@ -58,7 +58,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="item : ${historyPage.content}">
+                        <tr th:each="item : ${historyPage.content}" style="cursor:pointer;"
+                            th:data-user="${item.username != null ? '@' + item.username : 'ID: ' + item.chatId}"
+                            th:data-original="${item.originalText}"
+                            th:data-converted="${item.convertedText}"
+                            th:data-type="${item.conversionType.name()}"
+                            th:data-date="${#temporals.format(item.createdAt, 'dd.MM.yyyy HH:mm:ss')}"
+                            onclick="showDetail(this)">
                             <td style="padding-left:24px;">
                                 <span th:if="${item.username != null}" style="font-weight:600;" th:text="'@' + ${item.username}">@user</span>
                                 <span th:if="${item.username == null}" style="color:var(--text-muted);font-size:13px;" th:text="'ID: ' + ${item.chatId}">ID: 123</span>
@@ -119,6 +125,69 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Detail Modal -->
+<div id="detailModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeModal()">
+    <div style="background:#fff;border-radius:20px;max-width:600px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.2);animation:modalIn 0.25s ease;">
+        <div style="padding:24px 28px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-weight:700;font-size:17px;color:#0f172a;display:flex;align-items:center;gap:10px;">
+                <i class="bi bi-clock-history" style="color:#6366f1;"></i> Batafsil ma'lumot
+            </div>
+            <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:20px;padding:4px;"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div style="padding:28px;">
+            <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
+                <div style="background:#f8fafc;padding:8px 16px;border-radius:10px;font-size:13px;">
+                    <span style="color:#94a3b8;font-weight:600;">Foydalanuvchi:</span>
+                    <span id="mUser" style="font-weight:700;color:#0f172a;margin-left:4px;"></span>
+                </div>
+                <div style="background:#f8fafc;padding:8px 16px;border-radius:10px;font-size:13px;">
+                    <span style="color:#94a3b8;font-weight:600;">Sana:</span>
+                    <span id="mDate" style="font-weight:700;color:#0f172a;margin-left:4px;"></span>
+                </div>
+                <div id="mBadge"></div>
+            </div>
+            <div style="margin-bottom:16px;">
+                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-bottom:8px;">Asl matn</div>
+                <div id="mOriginal" style="background:#f8fafc;padding:16px;border-radius:12px;border:1px solid #e2e8f0;font-size:15px;line-height:1.6;color:#0f172a;word-break:break-word;max-height:200px;overflow-y:auto;"></div>
+            </div>
+            <div>
+                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-bottom:8px;">Natija</div>
+                <div id="mConverted" style="background:#eef2ff;padding:16px;border-radius:12px;border:1px solid #c7d2fe;font-size:15px;line-height:1.6;color:#312e81;word-break:break-word;max-height:200px;overflow-y:auto;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+</style>
+
+<script>
+    const typeLabels = {
+        LITERARY_TO_NEW: { text: 'Adabiy → Yangi', cls: 'badge-literary-new' },
+        LITERARY_TO_TRADITIONAL: { text: 'Adabiy → Kirill', cls: 'badge-literary-trad' },
+        TRADITIONAL_TO_NEW: { text: 'Kirill → Yangi', cls: 'badge-trad-new' }
+    };
+
+    function showDetail(row) {
+        document.getElementById('mUser').textContent = row.dataset.user;
+        document.getElementById('mDate').textContent = row.dataset.date;
+        document.getElementById('mOriginal').textContent = row.dataset.original;
+        document.getElementById('mConverted').textContent = row.dataset.converted;
+        const t = typeLabels[row.dataset.type] || { text: row.dataset.type, cls: '' };
+        document.getElementById('mBadge').innerHTML = '<span class="badge-type ' + t.cls + '" style="padding:8px 16px;font-size:13px;"><i class="bi bi-circle-fill" style="font-size:6px;"></i> ' + t.text + '</span>';
+        const modal = document.getElementById('detailModal');
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
 </div>
 </body>
 </html>
