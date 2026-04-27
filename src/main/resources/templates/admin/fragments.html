@@ -345,6 +345,11 @@
             <a th:href="@{/admin/history}" th:classappend="${active == 'history'} ? 'active'">
                 <i class="bi bi-clock-history"></i> Tarix
             </a>
+            <div class="sidebar-section">Asboblar</div>
+            <a th:href="@{/translate}" target="_blank" style="margin-top:4px;">
+                <i class="bi bi-translate"></i> Transliteratsiya
+                <i class="bi bi-box-arrow-up-right" style="font-size:12px;margin-left:auto;opacity:0.5;"></i>
+            </a>
         </div>
         <div class="sidebar-footer">
             <a th:href="@{/admin/logout}">
