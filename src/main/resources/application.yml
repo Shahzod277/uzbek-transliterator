@@ -8,10 +8,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
 
 server:
   port: ${PORT:8080}
+
+admin:
+  password: ${ADMIN_PASSWORD:admin123}
 
 bot:
   username: uzbek_translit_bot

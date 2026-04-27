@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uz">
+<head th:replace="~{admin/fragments :: head('Dashboard - Sheva Admin')}"></head>
+<body>
+<nav th:replace="~{admin/fragments :: sidebar('dashboard')}"></nav>
+
+<div class="main-content">
+    <div class="page-header animate-in">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Umumiy statistika va faollik ko'rsatkichlari</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-xl-3 animate-in delay-1">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);color:#4f46e5;">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="stat-value" th:text="${totalUsers}">0</div>
+                <div class="stat-label">Jami foydalanuvchilar</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3 animate-in delay-2">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:#059669;">
+                    <i class="bi bi-translate"></i>
+                </div>
+                <div class="stat-value" th:text="${totalConversions}">0</div>
+                <div class="stat-label">Jami konvertatsiyalar</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3 animate-in delay-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);color:#d97706;">
+                    <i class="bi bi-calendar-check-fill"></i>
+                </div>
+                <div class="stat-value" th:text="${todayConversions}">0</div>
+                <div class="stat-label">Bugungi konvertatsiyalar</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3 animate-in delay-4">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:linear-gradient(135deg,#fdf2f8,#fce7f3);color:#db2777;">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="stat-value" th:text="${totalConversions > 0 ? totalConversions / (totalUsers > 0 ? totalUsers : 1) : 0}">0</div>
+                <div class="stat-label">O'rtacha / foydalanuvchi</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conversion Type Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4 animate-in delay-3">
+            <div class="type-card">
+                <div class="type-bar" style="background:linear-gradient(90deg,#6366f1,#818cf8);"></div>
+                <div class="type-icon" style="background:#eef2ff;color:#4f46e5;">
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                </div>
+                <div class="type-value" style="color:#4f46e5;" th:text="${literaryToNew}">0</div>
+                <div class="type-label">Adabiy &rarr; Yangi transkripsiya</div>
+            </div>
+        </div>
+        <div class="col-md-4 animate-in delay-4">
+            <div class="type-card">
+                <div class="type-bar" style="background:linear-gradient(90deg,#ec4899,#f472b6);"></div>
+                <div class="type-icon" style="background:#fdf2f8;color:#db2777;">
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                </div>
+                <div class="type-value" style="color:#db2777;" th:text="${literaryToTraditional}">0</div>
+                <div class="type-label">Adabiy &rarr; An'anaviy (kirill)</div>
+            </div>
+        </div>
+        <div class="col-md-4 animate-in delay-5">
+            <div class="type-card">
+                <div class="type-bar" style="background:linear-gradient(90deg,#10b981,#34d399);"></div>
+                <div class="type-icon" style="background:#ecfdf5;color:#059669;">
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                </div>
+                <div class="type-value" style="color:#059669;" th:text="${traditionalToNew}">0</div>
+                <div class="type-label">An'anaviy &rarr; Yangi</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Chart -->
+        <div class="col-lg-7 animate-in delay-5">
+            <div class="card-panel">
+                <div class="card-panel-header">
+                    <i class="bi bi-bar-chart-fill"></i> Oxirgi 7 kun faolligi
+                </div>
+                <div class="card-panel-body">
+                    <canvas id="dailyChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Users -->
+        <div class="col-lg-5 animate-in delay-6">
+            <div class="card-panel">
+                <div class="card-panel-header">
+                    <i class="bi bi-trophy-fill"></i> Eng faol foydalanuvchilar
+                </div>
+                <div class="card-panel-body p-0">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr th:each="user, stat : ${topUsers}">
+                                <td style="padding-left:20px; width:44px;">
+                                    <div th:classappend="${stat.index == 0} ? 'rank-1' : (${stat.index == 1} ? 'rank-2' : (${stat.index == 2} ? 'rank-3' : 'rank-other'))"
+                                         class="rank-badge" th:text="${stat.index + 1}">1</div>
+                                </td>
+                                <td>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <div class="user-avatar"
+                                             th:style="'background:hsl(' + ${stat.index * 40 + 220} + ',70%,60%)'">
+                                            <span th:if="${user[1] != null}" th:text="${#strings.toUpperCase(#strings.substring(user[1],0,1))}">U</span>
+                                            <span th:if="${user[1] == null}">?</span>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight:600;font-size:14px;"
+                                                 th:if="${user[1] != null}" th:text="'@' + ${user[1]}">@user</div>
+                                            <div style="font-weight:600;font-size:14px;"
+                                                 th:if="${user[1] == null}" class="text-muted" th:text="'ID: ' + ${user[0]}">ID: 123</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-end" style="padding-right:20px;">
+                                    <span style="background:#f1f5f9;padding:6px 14px;border-radius:8px;font-weight:700;font-size:14px;color:#334155;"
+                                          th:text="${user[2]}">0</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(topUsers)}">
+                                <td colspan="3" class="text-center py-5" style="color:var(--text-muted);">
+                                    <i class="bi bi-inbox" style="font-size:32px;display:block;margin-bottom:8px;"></i>
+                                    Ma'lumot yo'q
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    const labels = [[${chartLabels}]];
+    const data = [[${chartData}]];
+
+    const ctx = document.getElementById('dailyChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+    gradient.addColorStop(1, 'rgba(99, 102, 241, 0.02)');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Konvertatsiyalar',
+                data: data,
+                backgroundColor: gradient,
+                borderColor: '#6366f1',
+                borderWidth: 2,
+                borderRadius: 10,
+                borderSkipped: false,
+                hoverBackgroundColor: 'rgba(99, 102, 241, 0.5)',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    titleFont: { family: 'Inter', weight: '600' },
+                    bodyFont: { family: 'Inter' },
+                    padding: 14,
+                    cornerRadius: 10,
+                    displayColors: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1, font: { family: 'Inter', size: 12 },
+                        color: '#94a3b8',
+                    },
+                    grid: { color: '#f1f5f9' },
+                    border: { display: false },
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Inter', size: 12, weight: '500' }, color: '#64748b' },
+                    border: { display: false },
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

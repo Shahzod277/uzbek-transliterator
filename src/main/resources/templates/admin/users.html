@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uz">
+<head th:replace="~{admin/fragments :: head('Foydalanuvchilar - Sheva Admin')}"></head>
+<body>
+<nav th:replace="~{admin/fragments :: sidebar('users')}"></nav>
+
+<div class="main-content">
+    <div class="page-header animate-in">
+        <div>
+            <h1>Foydalanuvchilar</h1>
+            <p>Botda ro'yxatdan o'tgan barcha foydalanuvchilar</p>
+        </div>
+        <div style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;padding:10px 20px;border-radius:12px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;">
+            <i class="bi bi-people-fill"></i>
+            <span th:text="${#lists.size(users)}">0</span> ta
+        </div>
+    </div>
+
+    <div class="card-panel animate-in delay-1">
+        <div class="card-panel-header" style="justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <i class="bi bi-person-lines-fill"></i> Ro'yxat
+            </div>
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Ism, username, telefon...">
+            </div>
+        </div>
+        <div class="card-panel-body p-0">
+            <div class="table-responsive">
+                <table class="table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th style="padding-left:24px;width:50px;">#</th>
+                            <th>Foydalanuvchi</th>
+                            <th>Telefon</th>
+                            <th>Ro'yxatdan o'tgan</th>
+                            <th class="text-end" style="padding-right:24px;">Konvertatsiyalar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user, stat : ${users}">
+                            <td style="padding-left:24px;" th:text="${stat.index + 1}">1</td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:14px;">
+                                    <div class="user-avatar"
+                                         th:style="'background:hsl(' + ${stat.index * 35 + 200} + ',65%,58%)'">
+                                        <span th:text="${user.firstName != null ? #strings.toUpperCase(#strings.substring(user.firstName, 0, 1)) : '?'}">U</span>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600;font-size:14px;">
+                                            <span th:text="${(user.firstName != null ? user.firstName : '') + ' ' + (user.lastName != null ? user.lastName : '')}">Ism</span>
+                                        </div>
+                                        <div style="font-size:13px;color:var(--text-muted);">
+                                            <span th:if="${user.username != null}" th:text="'@' + ${user.username}">@user</span>
+                                            <span th:if="${user.username == null}">username yo'q</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span style="font-family:'SF Mono',monospace;font-size:13px;background:#f1f5f9;padding:4px 10px;border-radius:6px;"
+                                      th:text="${user.phoneNumber}">+998</span>
+                            </td>
+                            <td>
+                                <div style="font-size:14px;" th:text="${#temporals.format(user.registeredAt, 'dd.MM.yyyy')}">01.01.2024</div>
+                                <div style="font-size:12px;color:var(--text-muted);" th:text="${#temporals.format(user.registeredAt, 'HH:mm')}">12:00</div>
+                            </td>
+                            <td class="text-end" style="padding-right:24px;">
+                                <span th:with="count=${conversionCounts.containsKey(user.chatId) ? conversionCounts.get(user.chatId) : 0}"
+                                      th:classappend="${count > 0} ? '' : ''"
+                                      style="font-weight:700;font-size:16px;"
+                                      th:style="${count > 0} ? 'color:#4f46e5' : 'color:var(--text-muted)'"
+                                      th:text="${count}">0</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(users)}">
+                            <td colspan="5" class="text-center py-5" style="color:var(--text-muted);">
+                                <i class="bi bi-people" style="font-size:40px;display:block;margin-bottom:10px;"></i>
+                                Hali foydalanuvchilar yo'q
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#usersTable tbody tr');
+        rows.forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+</body>
+</html>

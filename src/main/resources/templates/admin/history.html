@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uz">
+<head th:replace="~{admin/fragments :: head('Tarix - Sheva Admin')}"></head>
+<body>
+<nav th:replace="~{admin/fragments :: sidebar('history')}"></nav>
+
+<div class="main-content">
+    <div class="page-header animate-in">
+        <div>
+            <h1>Konvertatsiya tarixi</h1>
+            <p>Barcha tarjima qilingan matnlar</p>
+        </div>
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="animate-in delay-1" style="margin-bottom:24px;">
+        <div class="filter-pills">
+            <a th:href="@{/admin/history}" class="filter-pill"
+               th:classappend="${currentType == null} ? 'active'">
+                <i class="bi bi-grid-3x3-gap-fill"></i> Hammasi
+            </a>
+            <a th:href="@{/admin/history(type='LITERARY_TO_NEW')}" class="filter-pill"
+               th:classappend="${currentType == 'LITERARY_TO_NEW'} ? 'active'">
+                <i class="bi bi-arrow-right-short"></i> Adabiy &rarr; Yangi
+            </a>
+            <a th:href="@{/admin/history(type='LITERARY_TO_TRADITIONAL')}" class="filter-pill"
+               th:classappend="${currentType == 'LITERARY_TO_TRADITIONAL'} ? 'active'">
+                <i class="bi bi-arrow-right-short"></i> Adabiy &rarr; Kirill
+            </a>
+            <a th:href="@{/admin/history(type='TRADITIONAL_TO_NEW')}" class="filter-pill"
+               th:classappend="${currentType == 'TRADITIONAL_TO_NEW'} ? 'active'">
+                <i class="bi bi-arrow-right-short"></i> Kirill &rarr; Yangi
+            </a>
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="card-panel animate-in delay-2">
+        <div class="card-panel-header" style="justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <i class="bi bi-clock-history"></i>
+                Sahifa <strong th:text="${historyPage.number + 1}">1</strong> / <strong th:text="${historyPage.totalPages > 0 ? historyPage.totalPages : 1}">1</strong>
+            </div>
+            <div style="background:#f1f5f9;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text-secondary);">
+                Jami: <span th:text="${historyPage.totalElements}" style="color:var(--primary);font-weight:700;">0</span> ta
+            </div>
+        </div>
+        <div class="card-panel-body p-0">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="padding-left:24px;">Foydalanuvchi</th>
+                            <th>Asl matn</th>
+                            <th>Natija</th>
+                            <th>Turi</th>
+                            <th style="padding-right:24px;">Sana</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${historyPage.content}">
+                            <td style="padding-left:24px;">
+                                <span th:if="${item.username != null}" style="font-weight:600;" th:text="'@' + ${item.username}">@user</span>
+                                <span th:if="${item.username == null}" style="color:var(--text-muted);font-size:13px;" th:text="'ID: ' + ${item.chatId}">ID: 123</span>
+                            </td>
+                            <td>
+                                <div class="text-truncate-cell" th:text="${item.originalText}" th:title="${item.originalText}">text</div>
+                            </td>
+                            <td>
+                                <div class="text-truncate-cell" th:text="${item.convertedText}" th:title="${item.convertedText}">text</div>
+                            </td>
+                            <td>
+                                <span class="badge-type badge-literary-new"
+                                      th:if="${item.conversionType.name() == 'LITERARY_TO_NEW'}">
+                                    <i class="bi bi-circle-fill" style="font-size:6px;"></i> Adabiy &rarr; Yangi</span>
+                                <span class="badge-type badge-literary-trad"
+                                      th:if="${item.conversionType.name() == 'LITERARY_TO_TRADITIONAL'}">
+                                    <i class="bi bi-circle-fill" style="font-size:6px;"></i> Adabiy &rarr; Kirill</span>
+                                <span class="badge-type badge-trad-new"
+                                      th:if="${item.conversionType.name() == 'TRADITIONAL_TO_NEW'}">
+                                    <i class="bi bi-circle-fill" style="font-size:6px;"></i> Kirill &rarr; Yangi</span>
+                            </td>
+                            <td style="padding-right:24px;">
+                                <div style="font-size:14px;white-space:nowrap;" th:text="${#temporals.format(item.createdAt, 'dd.MM.yyyy')}">01.01.2024</div>
+                                <div style="font-size:12px;color:var(--text-muted);" th:text="${#temporals.format(item.createdAt, 'HH:mm')}">12:00</div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(historyPage.content)}">
+                            <td colspan="5" class="text-center py-5" style="color:var(--text-muted);">
+                                <i class="bi bi-inbox" style="font-size:40px;display:block;margin-bottom:10px;"></i>
+                                Ma'lumot yo'q
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div th:if="${historyPage.totalPages > 1}" class="card-panel-body border-top" style="padding:20px 28px;">
+            <div class="pagination-custom">
+                <a th:if="${historyPage.number > 0}"
+                   th:href="@{/admin/history(page=${historyPage.number - 1}, type=${currentType})}"
+                   class="page-btn">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <th:block th:each="i : ${#numbers.sequence(0, historyPage.totalPages - 1)}">
+                    <a th:if="${i >= historyPage.number - 2 and i <= historyPage.number + 2}"
+                       th:href="@{/admin/history(page=${i}, type=${currentType})}"
+                       class="page-btn"
+                       th:classappend="${i == historyPage.number} ? 'active'"
+                       th:text="${i + 1}">1</a>
+                </th:block>
+                <a th:if="${historyPage.number < historyPage.totalPages - 1}"
+                   th:href="@{/admin/history(page=${historyPage.number + 1}, type=${currentType})}"
+                   class="page-btn">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
