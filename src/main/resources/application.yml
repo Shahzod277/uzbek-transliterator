@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://dpg-d7ic32navr4c73file40-a.frankfurt-postgres.render.com/uzbek_transliterator_db
-    username: uzbek_transliterator_db_user
-    password: DFfvrlq6flEq2UBy8UaZfx1i5yw0Vth0
+    url: ${DATABASE_URL:jdbc:postgresql://dpg-d8f6k1reo5us73bhl030-a/uzbek_transliterator}
+    username: ${DATABASE_USERNAME:uzbek_transliterator_user}
+    password: ${DATABASE_PASSWORD:MqgPhaIP8u6lBeZvyPEjuTkMnhZDqQFp}
     driver-class-name: org.postgresql.Driver
 
   jpa:

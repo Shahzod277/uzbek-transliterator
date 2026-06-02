@@ -2,6 +2,7 @@ databases:
   - name: uzbek-transliterator-db
     plan: free
     databaseName: uzbek_transliterator
+    user: uzbek_transliterator_user
 
 services:
   - type: web
