@@ -13,7 +13,7 @@ services:
     branch: master
     envVars:
       - key: BOT_TOKEN
-        value: 8478504038:AAGTZK6oXiIGHtlZfKgB9aTfnwWB33Li2jU
+        sync: false
       - key: BOT_USERNAME
         value: uzbek_translit_bot
       - key: DATABASE_URL

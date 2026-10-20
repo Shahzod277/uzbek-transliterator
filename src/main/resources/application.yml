@@ -17,5 +17,5 @@ admin:
   password: ${ADMIN_PASSWORD:admin123}
 
 bot:
-  username: uzbek_translit_bot
-  token: 8478504038:AAGTZK6oXiIGHtlZfKgB9aTfnwWB33Li2jU
+  username: ${BOT_USERNAME:uzbek_translit_bot}
+  token: ${BOT_TOKEN}
